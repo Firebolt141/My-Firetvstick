@@ -1,6 +1,6 @@
 # My Fire TV Stick
 
-**New here? Start with [GETTING-STARTED.md](GETTING-STARTED.md).** Work in progress: [SAVEPOINT.md](SAVEPOINT.md). Setting it up with Claude Code on your PC? Point it at [STICK-SETUP-FOR-CLAUDE.md](STICK-SETUP-FOR-CLAUDE.md).
+**New here? Start with [GETTING-STARTED.md](GETTING-STARTED.md).** Work in progress: [SAVEPOINT.md](SAVEPOINT.md). Working with Claude Code on your PC? Have it read [HANDOVER.md](HANDOVER.md) first.
 
 A debloat of my **Fire TV Stick 4K / 4K Max (2nd gen, 2023)** running Fire OS 8 (Android 11). It's built on
 [cleanyourtv](https://github.com/Gathin23/cleanyourtv) and uses its tested

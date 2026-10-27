@@ -27,11 +27,12 @@ Design canvas (private): https://claude.ai/artifact/JJBnJQNc2JzJvGw8aSFPQ4
 - **Builds**: `lintRelease` + `assembleRelease` pass (2.4 MB APK). The signed build is the manual `launcher-apk` workflow.
 
 ## Open
-- **Not yet run on a real Fire TV.** Everything above runs off-device; only your stick can prove the real remote,
-  Home on Fire's hand-off and Fire OS's own settings screens. The 2-minute check list is in
-  GETTING-STARTED.md (Part 3). Report anything odd there and we fix it from this savepoint.
-- Fire OS may not have every Android settings screen (Bluetooth, display, screensaver). Those rows fall back to Fire TV
-  settings, so check them on the stick.
+- **Ran on the real stick on 2026-10-27:** installed, Home on Fire points at it, and it mostly works.
+- The next work is listed in **HANDOVER.md §3**:
+  - wallpaper problems;
+  - Firebolt branding for the setup wizard, logo and About screen;
+  - removing the old Couchy layouts;
+  - a permanent signing key.
 
 ## Rebuild locally in a new session
 JDK 17+ and Android SDK 34 are needed. In the cloud box this worked:
