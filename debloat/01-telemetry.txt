@@ -1,0 +1,23 @@
+# Batch 1 of 4: Amazon telemetry, metrics, logging and tracking.
+# Fire TV Stick 4K / 4K Max, 2nd gen 2023 (karat, AFTKM / AFTKRT), Fire OS 8 / Android 11.
+# Taken from cleanyourtv/examples/amazon-fire-tv-stick-4k-2023/debloat.txt (tested on Fire OS 8.1.8.5).
+# Everything is DISABLED for user 0, never uninstalled. Put a # in front of any line to keep that app.
+#
+# Protected by Fire OS 8 (pm refuses them), so not listed: com.amazon.device.metrics,
+# com.amazon.device.logmanager, com.amazon.device.crashmanager, com.amazon.diode, com.fireos.usagestats.proxy.
+
+com.amazon.client.metrics.api
+com.amazon.neo.minerva
+com.amazon.neo.minerva.logcat
+com.amazon.wirelessmetrics.service
+com.amazon.perfcollection
+com.amazon.perfc
+com.amazon.dp.logger
+com.amazon.ceviche                         # data collection pipelines
+com.amazon.tv.developer.dataservice        # content personalization data for third-party apps
+com.amazon.device.telemetry.emitter
+com.amazon.livedeviceservice
+com.amazon.privacypassservice              # privacy pass token service
+com.amazon.wifilocker                      # uploads Wi-Fi passwords to Amazon
+com.amazon.tv.acr                          # Automatic Content Recognition (watches what's on screen)
+com.amazon.ftvspatial                      # presence and indoor-location sensing

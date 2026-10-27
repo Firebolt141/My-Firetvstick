@@ -1,0 +1,20 @@
+# Batch 3 of 4: preloaded Amazon apps, tutorials and setup helpers.
+# Fire TV Stick 4K / 4K Max, 2nd gen 2023 (karat), Fire OS 8. Disabled for user 0, never uninstalled.
+# Silk is off by your choice. Music, Photos, Kids and Luna are off by default here: put a # in front of
+# any you use before running this batch.
+#
+# Protected by Fire OS 8, so not listed: com.amazon.tv.csapp (help app).
+
+com.amazon.cloud9                          # Silk browser
+com.amazon.tv.website_launcher             # opens websites in Silk
+com.amazon.gamehub                         # Amazon Luna / Game Hub
+com.amazon.bueller.music                   # Amazon Music
+com.amazon.bueller.photos                  # Amazon Photos
+com.amazon.tahoe                           # Amazon Kids (FreeTime)
+com.amazon.minitv.android.app              # miniTV stub
+com.amazon.tmm.tutorial                    # remote tutorial
+com.amazon.storm.lightning.tutorial        # remote app tutorial
+com.amazon.whisperjoin.middleware.v2.np    # frustration-free setup of other Amazon devices
+com.amazon.tv.ffsprovisioneeclient
+com.amazon.ods.kindleconnect               # "show on Fire TV" from Echo / Fire tablet
+com.amazon.tv.ftvambient                   # Ambient Experience (the plain screensaver stays)

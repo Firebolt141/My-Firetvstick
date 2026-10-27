@@ -1,0 +1,20 @@
+# Batch 4 of 4: Alexa extras. Voice search on the remote's mic button STAYS: the Alexa core (vizzini, aria,
+# cardinal, tcomm, ivona TTS, alexa.datastore, alexadirectivebrokerservice) is not listed.
+# This batch turns off Alexa alarms/timers/reminders, Alexa music playback, smart-home dashboard, calling /
+# Drop In and multi-room audio. If you ask Alexa on the stick for timers or music, comment those lines out.
+# Fire TV Stick 4K / 4K Max, 2nd gen 2023 (karat), Fire OS 8. Disabled for user 0, never uninstalled.
+
+com.amazon.tv.alexaalerts                  # alarms, timers, reminders
+com.amazon.tv.alexanotifications
+com.amazon.alexa.externalmediaplayer.fireos   # Alexa music playback
+com.amazon.alexamediaplayer.runtime.ftv
+com.amazon.aiondec                         # Alexa skill connections
+com.amazon.firetv.androidskillconnectioncapability   # Alexa skill connections / Alexa+ events
+com.amazon.spotify.mediabrowserservice     # Spotify for Alexa (stub; the Spotify app is separate)
+com.amazon.audiohome                       # Alexa Home Theater
+com.amazon.whad                            # whole-home audio (multi-room music)
+com.amazon.whasettings
+com.amazon.aca                             # Alexa hints/cues providers
+com.amazon.rtcsessioncontroller            # Alexa calling / Drop In
+com.amazon.smarthomemapviewapp             # smart home dashboard (cameras, lights)
+com.amazon.tv.mattercohost                 # Matter smart-home controller (Matter casting, com.amazon.tv.matter, stays)

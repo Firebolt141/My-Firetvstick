@@ -1,0 +1,29 @@
+# Batch 2 of 4: ads, sponsored rows, recommendations, promos, shopping.
+# Fire TV Stick 4K / 4K Max, 2nd gen 2023 (karat), Fire OS 8. Disabled for user 0, never uninstalled.
+#
+# KEEP com.amazon.imp enabled (it is not in this list on purpose). On one 4K Max 2023 unit, disabling it
+# together with several packages below left the home screen black. If Home goes black after this batch,
+# run: scripts/restore.sh 02   (no reboot needed).
+#
+# com.amazon.tv.livetv answers the "channel" intent, so cleanyourtv's safety check would hold it back as an
+# HDMI/tuner handler. A stick has no tuner or HDMI input, so scripts/debloat.sh runs this batch with
+# HANDLERS_ALLOW=1. Comment livetv out if you use the Live tab / guide.
+#
+# Protected by Fire OS 8, so not listed: com.amazon.ftvads.deeplinking.
+# The hero banner and "Sponsored" row come from the launcher's own feed; the AdGuard DNS step handles those.
+
+com.amazon.kso.blackbird                   # launcher ad sync / bidding
+com.amazon.sneakpeek                       # sponsored "Sneak Peek" previews
+com.amazon.hybridadidservice               # advertising ID service
+com.amazon.media.recommendations
+com.amazon.providers.contentsupport
+com.amazon.tv.easyupgrade                  # "upgrade your Fire TV" promos
+com.amazon.shoptv.client                   # Amazon Shopping on TV
+com.amazon.shoptv.firetv.client
+com.amazon.hedwig                          # Fire TV Channels
+com.amazon.tv.livetv                       # Live tab and guide (Pluto TV etc. still open as apps)
+com.amazon.franktvinput                    # live TV input feeding the Live tab
+com.amazon.systemnotices
+com.amazon.tv.releasenotes                 # "what's new" release notes
+com.amazon.uxnotification                  # UX notification popups
+com.amazon.tv.earlyaccess                  # early-access / preview program stub

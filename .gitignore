@@ -1,0 +1,7 @@
+# Local state from the scripts: device dumps (serial, android_id), screenshots, the venv and ADB key.
+backup/
+shots/
+cleanyourtv/tools/venv/
+cleanyourtv/tools/adbkey/
+__pycache__/
+.DS_Store
