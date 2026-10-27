@@ -28,3 +28,8 @@ for list in $(batches all); do
 done
 [ $back = 0 ] && echo "All listed packages are still disabled."
 tv 'dumpsys activity activities' | grep -m1 -E 'mResumedActivity|topResumedActivity' || true
+# Fire OS updates have broken Home redirects before; say so right after the reboot, not when the remote misbehaves.
+if tv 'pm list packages --user 0 io.github.toolicious.homeonfire' | grep -q homeonfire; then
+  echo
+  "$ROOT/scripts/launcher.sh" status || echo "Home redirect needs attention: TV_HOST=$TV_HOST scripts/launcher.sh setup" >&2
+fi

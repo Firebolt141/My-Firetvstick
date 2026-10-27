@@ -9,12 +9,14 @@ CORE_RE='^(android|com\.android\.systemui|com\.android\.shell|com\.android\.phon
 PROTECTED='com.amazon.device.metrics com.amazon.device.logmanager com.amazon.device.crashmanager com.amazon.diode
 com.fireos.usagestats.proxy com.amazon.ftvads.deeplinking com.amazon.tv.csapp'
 # Home, settings, Appstore, keyboard, sign-in, OTA, Prime Video, Alexa voice, casting. imp: Home goes black without it.
+# Couchy + Home on Fire (scripts/launcher.sh), and the quick-settings panel Home on Fire looks for.
 KEEP='com.amazon.tv.launcher com.amazon.firehomestarter com.amazon.tv.settings.v2 com.amazon.venezia com.amazon.tigris
 com.amazon.tv.ime com.amazon.imp com.amazon.tv.ottssocompanionapp com.amazon.tv.oobe com.amazon.device.software.ota
 com.amazon.device.software.ota.override com.amazon.tv.forcedotaupdater.v2 com.amazon.firebat com.amazon.tv.support
 com.amazon.vizzini com.amazon.aria com.amazon.cardinal com.amazon.tcomm com.amazon.alexa.datastore
 com.amazon.cast.sink com.amazon.dialservice com.amazon.awvflingreceiver com.amazon.whisperplay com.amazon.tv.matter
-com.amazon.ftv.screensaver com.amazon.logan'
+com.amazon.ftv.screensaver com.amazon.logan
+com.conreo.couchytv io.github.toolicious.homeonfire com.amazon.tv.quicksettings.ui'
 fail=0
 all=""
 for list in "$ROOT"/debloat/[0-9][0-9]-*.txt; do

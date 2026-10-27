@@ -9,9 +9,47 @@ safety-checked `disable.sh` / `restore.sh`.
 ads and sponsored previews, shopping, the Live tab, promos and tutorials, Silk, Music, Photos, Kids and Luna, plus the
 Alexa extras. Ad-blocking DNS (AdGuard) is also turned on. All of it can be undone.
 
-**What stays:** the Fire TV home screen (Fire OS doesn't let a third-party launcher take Home), Appstore,
+**What stays:** Amazon's home screen, installed underneath ([Couchy](#your-own-home-screen-couchy--home-on-fire)
+covers it), Appstore,
 Settings, keyboard, remote and Bluetooth, **Alexa voice search** on the mic button, **Prime Video**,
 **casting and screen mirroring**, firmware updates and the screensaver.
+
+## Your own home screen: Couchy + Home on Fire
+
+Fire OS never lets another app *become* Home. `com.amazon.tv.launcher` is a protected package,
+and Fire OS ignores `set-home-activity` and launcher priorities. What works instead is a redirect:
+- [Home on Fire](https://github.com/toolicious/home-on-fire) is open source (GPLv3) and has no
+  internet permission. Its accessibility service sees Amazon Home appear and brings your launcher
+  over it. On Fire OS 8 the switch is instant, apart from a ~250 ms flash of Amazon Home.
+- [Couchy Launcher](https://f-droid.org/packages/com.conreo.couchytv/) is open source (GPLv3) and
+  sends no telemetry. It is the launcher Home on Fire brings up.
+
+Amazon Home stays installed underneath. That's the safe arrangement: if the redirect ever stops,
+you land on Amazon Home rather than on a black screen.
+
+```sh
+scripts/launcher.sh status                                   # is everything wired up?
+scripts/launcher.sh setup                                    # repair: permission + accessibility service
+scripts/launcher.sh setup couchy.apk home-on-fire.apk        # install or update from APKs you downloaded
+scripts/launcher.sh undo                                     # Home button back to Amazon (apps stay installed)
+```
+`setup` grants Home on Fire its one-time `WRITE_SECURE_SETTINGS` permission. It adds the service to
+the existing accessibility services, so VoiceView and the rest stay on. Then it opens Home on Fire,
+where you check that the target is Couchy. Last, it asks you to press the **real** Home button and
+checks that Couchy is on screen. An ADB-injected Home press doesn't prove anything here, because a
+redirect that passed injected tests has failed on a physical remote before.
+
+`reboot-check.sh` also runs `launcher.sh status`, since Fire OS updates have broken Home redirects
+before. If Home goes back to Amazon after an update, run `scripts/launcher.sh setup` again.
+
+Tips:
+- **Long-press Home** opens Amazon's quick panel (Settings, sleep, profiles).
+- Home on Fire can **remap the app buttons** on the remote, including the Live TV button. That button
+  opens nothing after batch 02, so it is free for an app you use.
+- When you update an app, use the same source you installed it from. F-Droid, IzzyOnDroid and GitHub
+  builds are signed with different keys, so Android refuses to update one with another.
+- The debloat leaves on everything both apps need: Amazon Home, the Appstore (`venezia`), quick
+  settings and the accessibility host. `check-lists.sh` blocks any list from disabling them.
 
 ## Layout
 
@@ -22,6 +60,7 @@ Settings, keyboard, remote and Bluetooth, **Alexa voice search** on the mic butt
 | `debloat/03-preloads.txt` | Batch 3: Silk, Luna, Music, Photos, Kids, tutorials, setup helpers, Ambient |
 | `debloat/04-alexa-extras.txt` | Batch 4: Alexa alarms, timers, music, calling, smart-home dashboard (voice search stays) |
 | `scripts/` | The wrappers you run (below), plus `check-lists.sh`, which checks the lists offline (also run by CI) |
+| `scripts/launcher.sh` | Couchy + Home on Fire: status, setup/repair, undo |
 | `cleanyourtv/` | Files vendored from upstream: `tools/`, the reference list, TROUBLESHOOTING, LICENSE (MIT), `UPSTREAM_COMMIT` |
 
 To keep an app, put a `#` in front of its line before you run that batch. After editing a list, run
