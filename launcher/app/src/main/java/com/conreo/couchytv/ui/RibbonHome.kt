@@ -123,6 +123,9 @@ import kotlin.math.roundToInt
  * to the real screen with [Units], so every TV draws the same picture.
  */
 
+/** Height of the bottom band: section labels on top, then the tiles (focused and moving tiles grow into it). */
+private const val BAND = 268
+
 /** Slant of every tile: the top edge sits this fraction of the height to the right. */
 private const val SLANT = 0.12f
 
@@ -202,7 +205,7 @@ fun RibbonHome(
 
         // Readability over any wallpaper: darker at the left and right edges of the header.
         Box(
-            Modifier.fillMaxWidth().height(u.d(470)).background(
+            Modifier.fillMaxWidth().height(u.d(720 - BAND)).background(
                 Brush.horizontalGradient(
                     0f to Color(0xA004060C), 0.42f to Color(0x4004060C), 0.6f to Color(0x1A04060C), 1f to Color(0x6604060C)
                 )
@@ -213,7 +216,7 @@ fun RibbonHome(
             Header(u, config, time, locale, forecast, accent, onSetCity = { showCity = true })
             focusedItem?.let { item ->
                 Row(
-                    Modifier.offset(u.d(60), u.d(720 - 284 - 44)),
+                    Modifier.offset(u.d(60), u.d(720 - BAND - 56)),
                     verticalAlignment = Alignment.Bottom,
                     horizontalArrangement = Arrangement.spacedBy(u.d(14)),
                 ) {
@@ -226,7 +229,7 @@ fun RibbonHome(
                 }
             }
         } else {
-            Box(Modifier.fillMaxWidth().height(u.d(456)).background(Color(0xB0101114)))
+            Box(Modifier.fillMaxWidth().height(u.d(720 - BAND)).background(Color(0xB0101114)))
             Column(
                 Modifier.fillMaxWidth().offset(y = u.d(110)),
                 horizontalAlignment = Alignment.CenterHorizontally,
@@ -239,7 +242,7 @@ fun RibbonHome(
 
         // The band the ribbon sits on.
         Box(
-            Modifier.align(Alignment.BottomStart).fillMaxWidth().height(u.d(264))
+            Modifier.align(Alignment.BottomStart).fillMaxWidth().height(u.d(BAND))
                 .background(Color(0xED08090D))
                 .drawWithContent { drawContent(); drawLine(Color.White.copy(alpha = 0.08f), Offset.Zero, Offset(size.width, 0f), 1f) }
         )
@@ -255,7 +258,7 @@ fun RibbonHome(
 
         Ribbon(
             u, items, accent, movePkg, moveFocus,
-            modifier = Modifier.align(Alignment.BottomStart).padding(start = u.d(168)).fillMaxWidth().height(u.d(300)),
+            modifier = Modifier.align(Alignment.BottomStart).padding(start = u.d(168)).fillMaxWidth().height(u.d(BAND)),
             onFocused = { focusedItem = it },
             onLaunch = onLaunch,
             onMenu = onMenu,
@@ -530,12 +533,12 @@ private fun KeyGrid(
     val kOff = kh * SLANT
     // The top row sits one row's slant to the right, so the slanted edges read as one line.
     val shift = (kh + gap) * SLANT
-    Box(modifier.size(u.d(170), u.d(264))) {
+    Box(modifier.size(u.d(170), u.d(BAND))) {
         @Composable
         fun key(col: Int, row: Int, label: String, icon: androidx.compose.ui.graphics.vector.ImageVector, bg: Color, edge: Color, onClick: () -> Unit) {
             var focused by remember { mutableStateOf(false) }
             val x = 24 + (if (row == 0) shift else 0f) + col * (kw - kOff + gap)
-            val y = 264 - base - kh - (if (row == 0) kh + gap else 0)
+            val y = BAND - base - kh - (if (row == 0) kh + gap else 0)
             Box(
                 Modifier.offset(u.d(x), u.d(y)).size(u.d(kw), u.d(kh))
                     .zIndex(if (focused) 1f else 0f)
@@ -636,7 +639,7 @@ private fun Ribbon(
                 val tileH by animateDpAsState(
                     when { moving -> u.d(256); focused -> u.d(230); else -> u.d(200) }, tween(160), label = "tileH",
                 )
-                val itemH = u.d(300)
+                val itemH = u.d(BAND)
                 val req = requesters.getOrPut(item.key) { FocusRequester() }
                 Box(
                     Modifier
@@ -657,7 +660,7 @@ private fun Ribbon(
                             fontSize = u.s(13), fontWeight = FontWeight.SemiBold, letterSpacing = u.s(2),
                             color = if (focusedKey != null && items.firstOrNull { it.key == focusedKey }?.section == item.section) accent else Color.White.copy(alpha = 0.6f),
                             softWrap = false, maxLines = 1,
-                            modifier = Modifier.wrapContentWidth(Alignment.Start, unbounded = true).padding(start = u.d(28)),
+                            modifier = Modifier.wrapContentWidth(Alignment.Start, unbounded = true).padding(start = u.d(28), top = u.d(10)),
                         )
                     }
                     Tile(

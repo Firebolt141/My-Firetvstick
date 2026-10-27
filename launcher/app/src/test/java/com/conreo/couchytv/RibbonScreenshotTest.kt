@@ -86,8 +86,9 @@ class RibbonScreenshotTest {
 
     private fun forecast(now: Long, day: Boolean): Forecast {
         val h = 3_600_000L
-        val rise = if (day) now - 10 * h else now - 15 * h
-        val set = if (day) now + 95 * 60_000L else now - 3 * h
+        val hour = now - now % h
+        val rise = if (day) hour - 10 * h + 12 * 60_000L else hour - 14 * h + 12 * 60_000L
+        val set = if (day) hour + 94 * 60_000L else hour - 2 * h - 56 * 60_000L
         return Forecast(
             place = "Bengaluru", fetchedAt = now, temp = if (day) 29 else 24,
             sky = if (day) Sky.PARTLY else Sky.CLEAR, isDay = day, high = 31, low = 21, windKmh = 12,
@@ -95,11 +96,11 @@ class RibbonScreenshotTest {
             sunrises = listOf(rise, rise + 24 * h), sunsets = listOf(set, set + 24 * h),
             hours = listOf(
                 HourCast(now, if (day) 29 else 24, if (day) Sky.PARTLY else Sky.CLEAR, day, 0),
-                HourCast(now + h, 28, Sky.CLEAR, day, 0),
-                HourCast(now + 2 * h, 26, Sky.PARTLY, false, 5),
-                HourCast(now + 3 * h, 24, Sky.CLOUDY, false, 10),
-                HourCast(now + 4 * h, 23, Sky.RAIN, false, 40),
-                HourCast(now + 5 * h, 22, Sky.STORM, false, 70),
+                HourCast(hour + h, 28, Sky.CLEAR, day, 0),
+                HourCast(hour + 2 * h, 26, Sky.PARTLY, false, 5),
+                HourCast(hour + 3 * h, 24, Sky.CLOUDY, false, 10),
+                HourCast(hour + 4 * h, 23, Sky.RAIN, false, 40),
+                HourCast(hour + 5 * h, 22, Sky.STORM, false, 70),
             ),
         )
     }
@@ -112,6 +113,13 @@ class RibbonScreenshotTest {
             weatherPlace = "Bengaluru",
         )
         compose.setContent {
+            // A TV remote puts Compose in keyboard input mode; tests start in touch mode,
+            // where clickable tiles can't take focus.
+            val inputMode = androidx.compose.ui.platform.LocalInputModeManager.current
+            androidx.compose.runtime.LaunchedEffect(Unit) {
+                @OptIn(androidx.compose.ui.ExperimentalComposeUiApi::class)
+                inputMode.requestInputMode(androidx.compose.ui.input.InputMode.Keyboard)
+            }
             LiteTvTheme(accent = ACCENTS[6]) {
                 Box(
                     Modifier.fillMaxSize().background(

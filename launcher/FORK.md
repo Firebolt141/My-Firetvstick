@@ -11,6 +11,14 @@ Changes from upstream so far:
 - The setup wizard's `set-home-activity` hint uses the app's own package instead of Couchy's.
 - Removed upstream's F-Droid metadata and release workflow; this repo builds with `.github/workflows/launcher-apk.yml`.
 
+## The ribbon home (layout 3, default)
+
+![Day, VPN on](docs/img/ribbon-day.jpg)
+![Night, VPN off](docs/img/ribbon-night.jpg)
+![Edit mode](docs/img/ribbon-edit.jpg)
+
+Rendered off-device by `./gradlew recordRoborazziDebug` (sample apps and weather).
+
 ## Building (not done yet)
 
 1. Once: `scripts/launcher-keystore.sh`, then add the four secrets it prints to GitHub.

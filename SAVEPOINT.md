@@ -12,10 +12,15 @@ Resume from here. Design canvas (private): https://claude.ai/artifact/JJBnJQNc2J
   - `data/Weather.kt`: Open-Meteo (no key). City search is in Settings → Display, or on the "Set your city" button.
   - Brand tile colour is sampled from each banner's edges (`AppRepository.edgeColor`).
   - Settings → Display: "Ribbon" mode, weather city, °C/°F.
-- **Build status**: `./gradlew assembleDebug` **compiled successfully** in the cloud session (APK not committed). It has **not been run on a real Fire TV yet.**
+- **Build status**: debug and release builds compile in the cloud session (APK not committed). It has **not been run on a real Fire TV yet.**
+
+- **Screenshot test works**: `./gradlew recordRoborazziDebug` renders day / night / edit mode at Fire TV 1080p
+  (960×540 dp) into `app/build/outputs/roborazzi/`. Copies are in `launcher/docs/img/ribbon-*.jpg`.
+  It caught and fixed three issues: labels outside the band, a two-tone band, and an empty gap above the tiles.
+- `lintRelease` + `assembleRelease` pass, which is what the `launcher-apk` workflow runs.
 
 ## Not finished / next steps
-1. **Screenshot test** `app/src/test/.../RibbonScreenshotTest.kt` (Roborazzi + Robolectric) was added but **never ran**. The session stopped while it downloaded dependencies. Run `./gradlew recordRoborazziDebug` and look at `app/build/outputs/roborazzi/*.png`. If the new test plugins break the build, remove the roborazzi lines from both `build.gradle.kts` files.
+1. (The fake weather in the test is anchored to the real clock, so its sunrise/hour numbers don't match the "16:30" shown. That's test data only.)
 2. Install on the stick and check:
    - focus starts on the Recent tile;
    - Up opens the menu;
