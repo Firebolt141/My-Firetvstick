@@ -13,6 +13,7 @@ val ACCENTS = listOf(
     Color(0xFFF28B82),
     Color(0xFFD7AEFB),
     Color(0xFF78D9EC),
+    Color(0xFFFFB547), // amber, the ribbon default
 )
 
 data class WallpaperPreset(val name: String, val colors: List<Color>)

@@ -81,6 +81,7 @@ import com.conreo.couchytv.data.AppRepository
 import com.conreo.couchytv.data.ConfigStore
 import com.conreo.couchytv.data.LAYOUT_DOCK
 import com.conreo.couchytv.data.LAYOUT_GRID
+import com.conreo.couchytv.data.LAYOUT_RIBBON
 import com.conreo.couchytv.data.LauncherConfig
 import com.conreo.couchytv.data.NetStatus
 import com.conreo.couchytv.data.networkStatusFlow
@@ -488,13 +489,22 @@ fun LauncherApp(rescanTick: Int) {
         }
     }
 
+    // The ribbon is one flat strip like the dock, so it reorders the same way.
     fun moveHorizontal(delta: Int) =
-        if (config.layout == LAYOUT_DOCK) moveDock(delta) else moveWithinRow(delta)
+        if (config.layout == LAYOUT_DOCK || config.layout == LAYOUT_RIBBON) moveDock(delta) else moveWithinRow(delta)
 
     fun moveVertical(delta: Int) = when (config.layout) {
         LAYOUT_GRID -> moveGridVertical(delta, gridCols)
         LAYOUT_DOCK -> moveDock(if (delta < 0) -dockCols else dockCols)
+        LAYOUT_RIBBON -> {}
         else -> moveAcrossRows(delta)
+    }
+
+    // Launch and remember it for the ribbon's Recent tiles.
+    fun launch(app: AppEntry) {
+        if (movePkg != null) return
+        Actions.launchApp(context, app.pkg)
+        scope.launch { store.update { it.copy(recent = (listOf(app.pkg) + (it.recent - app.pkg)).take(6)) } }
     }
 
     val moveFocus = remember { FocusRequester() }
@@ -686,6 +696,8 @@ fun LauncherApp(rescanTick: Int) {
                 // When hidden it collapses to an invisible 4dp strip that is still
                 // focusable: Up from the top row slides it back into view.
                 var statusBarFocused by remember { mutableStateOf(false) }
+                // The ribbon draws its own clock and keys, so it has no status bar.
+                if (config.layout != LAYOUT_RIBBON) {
                 val statusBarHeight by animateDpAsState(
                     targetValue = if (config.showStatusBar || statusBarFocused) 80.dp else 4.dp,
                     label = "statusBarHeight",
@@ -717,7 +729,34 @@ fun LauncherApp(rescanTick: Int) {
                         onSettingsClick = { showSettings = true },
                     )
                 }
+                }
                 when (config.layout) {
+                    LAYOUT_RIBBON -> RibbonHome(
+                        apps = apps,
+                        sections = categorized,
+                        config = config,
+                        accent = accent,
+                        net = net,
+                        time = time,
+                        movePkg = movePkg,
+                        moveFocus = moveFocus,
+                        onLaunch = ::launch,
+                        onMenu = { app -> if (movePkg == null) menuFor = app },
+                        onSettings = { showSettings = true },
+                        onNetwork = { Actions.openNetworkSettings(context) },
+                        onVpn = {
+                            if (config.vpnApp.isNotEmpty()) Actions.launchApp(context, config.vpnApp)
+                            else Actions.openVpnSettings(context)
+                        },
+                        onSetPlace = { place ->
+                            scope.launch {
+                                store.update {
+                                    if (place == null) it.copy(weatherPlace = "")
+                                    else it.copy(weatherPlace = place.name, weatherLat = place.lat, weatherLon = place.lon)
+                                }
+                            }
+                        },
+                    )
                     LAYOUT_DOCK -> DockArea(
                         modifier = Modifier.weight(1f).fillMaxWidth(),
                         apps = dockApps,
@@ -730,7 +769,7 @@ fun LauncherApp(rescanTick: Int) {
                         intro = introShown,
                         expanded = dockExpanded,
                         onExpandChange = { dockExpanded = it },
-                        onLaunch = { app -> if (movePkg == null) Actions.launchApp(context, app.pkg) },
+                        onLaunch = ::launch,
                         onMenu = { app -> if (movePkg == null) menuFor = app },
                     )
                     else -> {
@@ -834,14 +873,14 @@ fun LauncherApp(rescanTick: Int) {
                                     GridSection(
                                         catApps, config, accent, movePkg, moveFocus,
                                         cardWidth, gap, introShown,
-                                        onLaunch = { app -> if (movePkg == null) Actions.launchApp(context, app.pkg) },
+                                        onLaunch = ::launch,
                                         onMenu = { app -> if (movePkg == null) menuFor = app },
                                     )
                                 } else {
                                     CarouselSection(
                                         catApps, config, accent, movePkg, moveFocus,
                                         cardWidth, gap,
-                                        onLaunch = { app -> if (movePkg == null) Actions.launchApp(context, app.pkg) },
+                                        onLaunch = ::launch,
                                         onMenu = { app -> if (movePkg == null) menuFor = app },
                                     )
                                 }

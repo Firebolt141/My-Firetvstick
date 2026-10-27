@@ -77,6 +77,7 @@ import com.conreo.couchytv.data.ConfigStore
 import com.conreo.couchytv.data.DATE_FORMATS
 import com.conreo.couchytv.data.LAYOUT_DOCK
 import com.conreo.couchytv.data.LAYOUT_GRID
+import com.conreo.couchytv.data.LAYOUT_RIBBON
 import com.conreo.couchytv.data.LauncherConfig
 import kotlinx.coroutines.Dispatchers
 import androidx.compose.runtime.withFrameNanos
@@ -503,18 +504,49 @@ private fun DisplayScreen(
         SelectorRow(
             modifier = Modifier.focusRequester(f),
             label = stringResource(R.string.view_mode),
-            value = listOf(stringResource(R.string.mode_carousel), stringResource(R.string.mode_grid), stringResource(R.string.mode_dock))[config.layout.coerceIn(0, 2)],
+            value = listOf(stringResource(R.string.mode_carousel), stringResource(R.string.mode_grid), stringResource(R.string.mode_dock), stringResource(R.string.mode_ribbon))[config.layout.coerceIn(0, 3)],
             description = when (config.layout) {
                 LAYOUT_GRID -> stringResource(R.string.mode_grid_desc)
                 LAYOUT_DOCK -> stringResource(R.string.mode_dock_desc)
+                LAYOUT_RIBBON -> stringResource(R.string.mode_ribbon_desc)
                 else -> stringResource(R.string.mode_carousel_desc)
             },
-            steps = 3,
-            current = config.layout.coerceIn(0, 2),
+            steps = 4,
+            current = config.layout.coerceIn(0, 3),
             onSelect = { v -> update { it.copy(layout = v) } },
         )
-        // Section names are only drawn in carousel/grid — hide the toggle in dock.
-        if (config.layout != LAYOUT_DOCK) {
+        // The ribbon's weather: a city search, and the unit.
+        if (config.layout == LAYOUT_RIBBON) {
+            var showCity by remember { mutableStateOf(false) }
+            SettingsItem(
+                selected = false,
+                onClick = { showCity = true },
+                headlineContent = { Text(stringResource(R.string.weather_city_row)) },
+                trailingContent = { Text(config.weatherPlace.ifEmpty { stringResource(R.string.weather_off) }, maxLines = 1, overflow = TextOverflow.Ellipsis) },
+            )
+            SelectorRow(
+                label = stringResource(R.string.temp_unit),
+                value = if (config.celsius) "°C" else "°F",
+                steps = 2,
+                current = if (config.celsius) 0 else 1,
+                onSelect = { v -> update { it.copy(celsius = v == 0) } },
+            )
+            if (showCity) {
+                CityDialog(
+                    current = config.weatherPlace,
+                    onDismiss = { showCity = false },
+                    onPick = { place ->
+                        showCity = false
+                        update {
+                            if (place == null) it.copy(weatherPlace = "")
+                            else it.copy(weatherPlace = place.name, weatherLat = place.lat, weatherLon = place.lon)
+                        }
+                    },
+                )
+            }
+        }
+        // Section names are only drawn in carousel/grid — hide the toggle in dock and ribbon.
+        if (config.layout != LAYOUT_DOCK && config.layout != LAYOUT_RIBBON) {
             SectionLabel(stringResource(R.string.section_elements))
             SettingsItem(
                 selected = false,

@@ -33,6 +33,8 @@ data class AppEntry(
     val autoCategory: String,
     /** Tile color precomputed at scan time — never hashed during composition. */
     val tile: Color,
+    /** Brand colour sampled from the banner's edges (ribbon tiles); [tile] if none. */
+    val brand: Color,
     /** lastUpdateTime of the package — used to reuse entries across rescans. */
     val stamp: Long,
     /** firstInstallTime — tiebreak so a newly installed app sorts last in its section. */
@@ -162,6 +164,7 @@ object AppRepository {
                     icon = icon?.asImageBitmap(),
                     autoCategory = autoCategory(ai.applicationInfo),
                     tile = tileColor(pkg),
+                    brand = banner?.let { edgeColor(it) } ?: tileColor(pkg),
                     stamp = stamp,
                     firstInstall = firstInstall,
                 )
@@ -211,6 +214,22 @@ object AppRepository {
         }
         return bmp
     }
+
+    /**
+     * Average of the banner's left and right edge pixels: most TV banners are a
+     * logo on a flat brand colour, so this recovers that colour to fill the tall
+     * ribbon tile around the banner. Null when the edges are transparent.
+     */
+    private fun edgeColor(bmp: Bitmap): Color? = runCatching {
+        var r = 0L; var g = 0L; var b = 0L; var n = 0
+        val xs = intArrayOf(1, bmp.width - 2)
+        for (x in xs) for (i in 1..9) {
+            val p = bmp.getPixel(x, bmp.height * i / 10 - 1)
+            if ((p ushr 24) < 200) continue
+            r += (p shr 16) and 0xFF; g += (p shr 8) and 0xFF; b += p and 0xFF; n++
+        }
+        if (n < 6) null else Color((r / n).toInt(), (g / n).toInt(), (b / n).toInt())
+    }.getOrNull()
 
     private fun autoCategory(ai: ApplicationInfo?): String {
         ai ?: return "apps"

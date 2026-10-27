@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Firebolt Home's ribbon layout. English only for now; other languages fall back to these. -->
+<resources xmlns:tools="http://schemas.android.com/tools" tools:ignore="MissingTranslation">
+    <string name="mode_ribbon">Ribbon</string>
+    <string name="mode_ribbon_desc">Slanted app ribbon with clock, forecast and sun arc</string>
+    <string name="ribbon_recent">Recent</string>
+    <string name="ribbon_up_options">Up for options</string>
+    <string name="ribbon_now">Now</string>
+    <string name="ribbon_sunrise">Sunrise %1$s</string>
+    <string name="ribbon_sunset">Sunset %1$s</string>
+    <string name="ribbon_sunset_in">SUNSET IN</string>
+    <string name="ribbon_sunrise_in">SUNRISE IN</string>
+    <string name="ribbon_hm">%1$d h %2$d min</string>
+    <string name="ribbon_min">%1$d min</string>
+    <string name="ribbon_rain">Rain</string>
+    <string name="ribbon_wind">Wind</string>
+    <string name="ribbon_air">Air</string>
+    <string name="ribbon_uv">UV</string>
+    <string name="ribbon_moon">Moon</string>
+    <string name="ribbon_hilo">H %1$d° · L %2$d°</string>
+    <string name="ribbon_set_city">Set your city for weather</string>
+    <string name="ribbon_weather_loading">Loading weather…</string>
+    <string name="ribbon_edit_title">EDIT MODE</string>
+    <string name="ribbon_edit_hint">Left and Right move the tile · OK drops it · Back cancels</string>
+    <string name="ribbon_search_hint">Type an app name</string>
+    <string name="ribbon_no_match">No app matches</string>
+    <string name="key_search">Search apps</string>
+    <string name="key_settings">Settings</string>
+    <string name="key_network">Network settings</string>
+    <string name="key_vpn_on">VPN connected: open the VPN app</string>
+    <string name="key_vpn_off">VPN not connected: open the VPN app</string>
+    <string name="city_title">Weather city</string>
+    <string name="city_hint">City name</string>
+    <string name="city_search">Search</string>
+    <string name="city_off">Turn weather off</string>
+    <string name="city_none">No city found</string>
+    <string name="city_failed">Search failed. Check the network.</string>
+    <string name="weather_city_row">Weather city</string>
+    <string name="weather_off">Off</string>
+    <string name="temp_unit">Temperature</string>
+    <string name="sky_clear">Clear</string>
+    <string name="sky_clear_night">Clear night</string>
+    <string name="sky_partly">Partly cloudy</string>
+    <string name="sky_cloudy">Cloudy</string>
+    <string name="sky_fog">Fog</string>
+    <string name="sky_drizzle">Drizzle</string>
+    <string name="sky_rain">Rain</string>
+    <string name="sky_snow">Snow</string>
+    <string name="sky_storm">Thunderstorm</string>
+</resources>

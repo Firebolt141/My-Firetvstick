@@ -45,7 +45,7 @@ data class LauncherConfig(
     val builtinSource: Int = 0,
     /** video wallpaper playback speed: index into VIDEO_SPEEDS */
     val videoSpeed: Int = 3, // 1x
-    val accent: Int = 0,
+    val accent: Int = 6, // Amber, the ribbon's accent
     val h24: Boolean = true,
     val showHidden: Boolean = false,
     val setupDone: Boolean = false,
@@ -73,13 +73,22 @@ data class LauncherConfig(
     val uiScale: Int = 0, // Auto
     /** language code (e.g. "fr", "de"); empty = system default */
     val language: String = "",
-    /** 0 = carousel (fixed selection), 1 = grid, 2 = dock */
-    val layout: Int = 2, // Dock
+    /** 0 = carousel (fixed selection), 1 = grid, 2 = dock, 3 = slanted ribbon */
+    val layout: Int = 3, // Ribbon
+    // ----- ribbon home -----
+    /** packages launched from the home screen, most recent first */
+    val recent: List<String> = emptyList(),
+    /** weather location, set from a city search; empty = weather off */
+    val weatherPlace: String = "",
+    val weatherLat: Double = 0.0,
+    val weatherLon: Double = 0.0,
+    val celsius: Boolean = true,
 )
 
 const val LAYOUT_CAROUSEL = 0
 const val LAYOUT_GRID = 1
 const val LAYOUT_DOCK = 2
+const val LAYOUT_RIBBON = 3
 
 /** Status bar date formats (SimpleDateFormat patterns); index 0 = off. */
 val DATE_FORMATS = listOf("", "EEE d", "EEE d MMM", "d MMM yyyy", "dd/MM", "MM/dd", "yyyy-MM-dd")
