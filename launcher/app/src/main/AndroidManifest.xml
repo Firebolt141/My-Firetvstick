@@ -22,6 +22,12 @@
     <uses-permission android:name="android.permission.KILL_BACKGROUND_PROCESSES" />
     <!-- Show the system uninstall dialog -->
     <uses-permission android:name="android.permission.REQUEST_DELETE_PACKAGES" />
+    <!-- Quick panel's ad-block DNS switch (Private DNS). Only works after a one-time
+         `adb shell pm grant <pkg> android.permission.WRITE_SECURE_SETTINGS`
+         (scripts/launcher.sh setup does it); without it the switch says so. -->
+    <uses-permission
+        android:name="android.permission.WRITE_SECURE_SETTINGS"
+        tools:ignore="ProtectedPermissions" />
 
     <application
         android:allowBackup="true"

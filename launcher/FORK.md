@@ -10,14 +10,20 @@ Changes from upstream so far:
 - App name "Firebolt Home" (working name: `app_name` in `app/src/main/res/values*/strings.xml`), version `0.1.0`.
 - The setup wizard's `set-home-activity` hint uses the app's own package instead of Couchy's.
 - Removed upstream's F-Droid metadata and release workflow; this repo builds with `.github/workflows/launcher-apk.yml`.
+- New: the ribbon home (`ui/RibbonHome.kt`, `ui/QuickPanel.kt`, `data/RibbonOrder.kt`, `data/Weather.kt`,
+  `data/SystemSwitches.kt`), a brand colour per app (`AppRepository.edgeColor`), an amber accent, and
+  `WRITE_SECURE_SETTINGS` for the Quick panel's DNS switch (granted over ADB by `scripts/launcher.sh setup`).
 
 ## The ribbon home (layout 3, default)
 
 ![Day, VPN on](docs/img/ribbon-day.jpg)
 ![Night, VPN off](docs/img/ribbon-night.jpg)
 ![Edit mode](docs/img/ribbon-edit.jpg)
+![Quick panel](docs/img/ribbon-quick.jpg)
+![German](docs/img/ribbon-day-de.jpg)
 
-Rendered off-device by `./gradlew recordRoborazziDebug` (sample apps and weather).
+Rendered off-device by `./gradlew recordRoborazziDebug` (sample apps and weather). The same run executes the
+logic and remote-key tests; CI runs it on every launcher change (`.github/workflows/launcher-tests.yml`).
 
 ## Building (not done yet)
 

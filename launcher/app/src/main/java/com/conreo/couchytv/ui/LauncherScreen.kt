@@ -82,6 +82,7 @@ import com.conreo.couchytv.data.ConfigStore
 import com.conreo.couchytv.data.LAYOUT_DOCK
 import com.conreo.couchytv.data.LAYOUT_GRID
 import com.conreo.couchytv.data.LAYOUT_RIBBON
+import com.conreo.couchytv.data.RibbonOrder
 import com.conreo.couchytv.data.LauncherConfig
 import com.conreo.couchytv.data.NetStatus
 import com.conreo.couchytv.data.networkStatusFlow
@@ -441,22 +442,9 @@ fun LauncherApp(rescanTick: Int) {
         }
     }
 
-    // Dock: one flat sequence (all sections concatenated). Moving by [delta]
-    // positions may cross a section block, so the moved app is re-homed into
-    // its new neighbour's section and every affected order list is rebuilt from
-    // the resulting sequence.
-    // ponytail: a multi-section app (shown once in the dock) is re-homed only
-    // for its displayed section; its other memberships are left as-is.
-    fun moveDock(delta: Int) {
-        val pkg = movePkg ?: return
-        val fi = dockApps.indexOfFirst { it.pkg == pkg }
-        if (fi < 0) return
-        val target = fi + delta
-        if (target < 0 || target >= dockApps.size) return
-        val flat = dockApps.map { it.pkg }.toMutableList()
-        flat.removeAt(fi)
-        flat.add(target, pkg)
-
+    // Re-home [pkg] into its new neighbour's section and rebuild every section's
+    // order from the flat sequence [flat], where [pkg] now sits at [target].
+    fun commitFlat(pkg: String, flat: List<String>, target: Int) {
         val orderCats = config.categories.map { it.id }
         fun dockCatOf(p: String): String {
             val app = apps.firstOrNull { it.pkg == p } ?: return orderCats.last()
@@ -489,14 +477,52 @@ fun LauncherApp(rescanTick: Int) {
         }
     }
 
-    // The ribbon is one flat strip like the dock, so it reorders the same way.
-    fun moveHorizontal(delta: Int) =
-        if (config.layout == LAYOUT_DOCK || config.layout == LAYOUT_RIBBON) moveDock(delta) else moveWithinRow(delta)
+    // Dock: one flat sequence (all sections concatenated). Moving by [delta]
+    // positions may cross a section block, so the moved app is re-homed into
+    // its new neighbour's section and every affected order list is rebuilt from
+    // the resulting sequence.
+    // ponytail: a multi-section app (shown once in the dock) is re-homed only
+    // for its displayed section; its other memberships are left as-is.
+    fun moveDock(delta: Int) {
+        val pkg = movePkg ?: return
+        val fi = dockApps.indexOfFirst { it.pkg == pkg }
+        if (fi < 0) return
+        val target = fi + delta
+        if (target < 0 || target >= dockApps.size) return
+        val flat = dockApps.map { it.pkg }.toMutableList()
+        flat.removeAt(fi)
+        flat.add(target, pkg)
+        commitFlat(pkg, flat, target)
+    }
+
+    // Ribbon: one visible step at a time. Recent apps are not repeated in their
+    // sections on screen, so the step skips past them but keeps them in the order.
+    fun moveRibbon(delta: Int) {
+        val pkg = movePkg ?: return
+        val recent = RibbonOrder.recent(apps, config).map { it.pkg }.toSet()
+        val visible = RibbonOrder.flat(categorized, recent, pkg).map { it.second.pkg }
+        val (flat, target) = RibbonOrder.step(pkg, delta, visible, dockApps.map { it.pkg }) ?: return
+        commitFlat(pkg, flat, target)
+    }
+
+    fun moveHorizontal(delta: Int) = when (config.layout) {
+        LAYOUT_DOCK -> moveDock(delta)
+        LAYOUT_RIBBON -> moveRibbon(delta)
+        else -> moveWithinRow(delta)
+    }
 
     fun moveVertical(delta: Int) = when (config.layout) {
         LAYOUT_GRID -> moveGridVertical(delta, gridCols)
         LAYOUT_DOCK -> moveDock(if (delta < 0) -dockCols else dockCols)
-        LAYOUT_RIBBON -> {}
+        // Up takes the tile off the ribbon (hidden, not uninstalled; Settings > Apps brings it back).
+        LAYOUT_RIBBON -> {
+            val p = movePkg
+            if (delta < 0 && p != null) {
+                movePkg = null
+                scope.launch { store.update { it.copy(hidden = it.hidden + p) } }
+            }
+            Unit
+        }
         else -> moveAcrossRows(delta)
     }
 

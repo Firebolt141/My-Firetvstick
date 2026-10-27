@@ -1,36 +1,37 @@
-# Savepoint: where Firebolt Home stopped (2026-10-27)
+# Savepoint: where Firebolt Home stands (2026-10-27)
 
-Resume from here. Design canvas (private): https://claude.ai/artifact/JJBnJQNc2JzJvGw8aSFPQ4
+Design canvas (private): https://claude.ai/artifact/JJBnJQNc2JzJvGw8aSFPQ4
 
 ## Done
 - **Debloat** (`debloat/`, `scripts/`): 4 batches, 57 packages. Includes backup, restore, AdGuard DNS, a check after reboot, and closing ADB. Lists are checked in CI.
 - **Home redirect**: `scripts/launcher.sh` (status/setup/undo) for Home on Fire plus Couchy, or the fork (`LAUNCHER=firebolt`).
-- **Fork** `launcher/` (Couchy 1.0.6, app id `io.github.firebolt141.home`), with the new **ribbon home** as layout 3, the default:
-  - `ui/RibbonHome.kt`: slanted ribbon (Recent, then sections, one continuous strip). The focused tile lifts and widens and the rest dim. Up opens the app menu, holding Left/Right jumps a section, and move mode reorders.
-  - 2×2 slanted keys: Search, Settings, Wi-Fi, VPN. The VPN key is green or red from Android's VPN state.
-  - Header: clock, date, weather, a 6-hour strip, and the sun/moon arc with rain/wind/air/UV (or moon) chips.
-  - `data/Weather.kt`: Open-Meteo (no key). City search is in Settings → Display, or on the "Set your city" button.
-  - Brand tile colour is sampled from each banner's edges (`AppRepository.edgeColor`).
-  - Settings → Display: "Ribbon" mode, weather city, °C/°F.
-- **Build status**: debug and release builds compile in the cloud session (APK not committed). It has **not been run on a real Fire TV yet.**
+  For the fork, `setup` also grants the permission the Quick panel's DNS switch needs, and `undo` revokes it.
+- **Fork** `launcher/` (Couchy 1.0.6, app id `io.github.firebolt141.home`), ribbon home = layout 3, the default:
+  - `ui/RibbonHome.kt`: slanted ribbon. Recent comes first, then sections; each app shows once (`data/RibbonOrder.kt`).
+    - The focused tile lifts and widens and the rest dim. Up opens the app menu, and holding Left/Right jumps a section.
+    - Edit mode: ‹ ✕ › on the lifted tile. Left/Right moves it one visible step, Up hides it, OK drops it.
+  - 2×2 slanted keys: Search, Quick panel, Wi-Fi, and VPN (green or red from Android's VPN state).
+  - `ui/QuickPanel.kt` + `data/SystemSwitches.kt`:
+    - ad-block Private DNS switch (needs the ADB grant above);
+    - Wi-Fi, Bluetooth, display, screensaver, home screen settings and Fire TV settings shortcuts;
+    - a warning while ADB debugging is on.
+  - Header: clock, date, weather, a 6-hour strip, and the sun/moon arc with chips. Data from `data/Weather.kt` (Open-Meteo, no key).
+  - Brand tile colours are sampled from each banner's edges.
+  - Settings → Display: Ribbon mode, weather city, °C/°F.
+  - All new text is translated into Couchy's 17 languages (`res/values-*/strings_ribbon.xml`).
+- **Tests** (`launcher/app/src/test`, 19 passing):
+  - `RibbonLogicTest`: ordering, the move step past hidden Recent apps, Open-Meteo parsing in the city's time zone, the day/night arc, weather codes, moon.
+  - `RibbonInteractionTest`: remote keys. Focus starts on Recent; Right moves; OK launches; Up opens the menu; holding Right/Left jumps sections; no duplicate tiles.
+  - `RibbonScreenshotTest`: day, night, edit mode, Quick panel, and German. Renders are in `launcher/docs/img/ribbon-*.jpg`.
+  - CI: `.github/workflows/launcher-tests.yml` runs them plus lint whenever `launcher/` changes, and keeps the renders.
+- **Builds**: `lintRelease` + `assembleRelease` pass (2.4 MB APK). The signed build is the manual `launcher-apk` workflow.
 
-- **Screenshot test works**: `./gradlew recordRoborazziDebug` renders day / night / edit mode at Fire TV 1080p
-  (960×540 dp) into `app/build/outputs/roborazzi/`. Copies are in `launcher/docs/img/ribbon-*.jpg`.
-  It caught and fixed three issues: labels outside the band, a two-tone band, and an empty gap above the tiles.
-- `lintRelease` + `assembleRelease` pass, which is what the `launcher-apk` workflow runs.
-
-## Not finished / next steps
-1. (The fake weather in the test is anchored to the real clock, so its sunrise/hour numbers don't match the "16:30" shown. That's test data only.)
-2. Install on the stick and check:
-   - focus starts on the Recent tile;
-   - Up opens the menu;
-   - holding Right jumps;
-   - edit mode works;
-   - the VPN colour is right;
-   - the weather loads.
-3. Edit-mode extras from the design (an × above the lifted tile, arrows) are not built; Couchy's own move mode is used.
-4. Quick panel (ad-block DNS switch, ADB warning) is not built; the Settings key opens Couchy's settings.
-5. Polish: translations of `strings_ribbon.xml`, picking a name, accent choice (amber default).
+## Open
+- **Not yet run on a real Fire TV.** Everything above runs off-device; only your stick can prove the real remote,
+  Home on Fire's hand-off and Fire OS's own settings screens. The 2-minute check list is in
+  GETTING-STARTED.md (Part 3). Report anything odd there and we fix it from this savepoint.
+- Fire OS may not have every Android settings screen (Bluetooth, display, screensaver). Those rows fall back to Fire TV
+  settings, so check them on the stick.
 
 ## Rebuild locally in a new session
 JDK 17+ and Android SDK 34 are needed. In the cloud box this worked:
@@ -40,5 +41,5 @@ curl -sSfLo clt.zip https://dl.google.com/android/repository/commandlinetools-li
 unzip -q clt.zip -d cmdline-tools && mv cmdline-tools/cmdline-tools cmdline-tools/latest
 yes | cmdline-tools/latest/bin/sdkmanager --licenses; cmdline-tools/latest/bin/sdkmanager "platforms;android-34" "build-tools;34.0.0"
 cd <repo>/launcher && echo "sdk.dir=$HOME/android-sdk" > local.properties
-./gradlew assembleDebug --max-workers=1   # Maven Central rate-limits (429): just retry
+./gradlew recordRoborazziDebug lintRelease --max-workers=1   # Maven Central rate-limits (429): just retry
 ```

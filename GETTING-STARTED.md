@@ -72,12 +72,38 @@ It's a version of Couchy with the design from the canvas. It's **new and not yet
 ```sh
 LAUNCHER=firebolt scripts/launcher.sh setup firebolt-home-0.1.0-couchy1.0.6.apk
 ```
-In Home on Fire, choose **Firebolt Home** as the target. On the remote:
-- **Left/Right** moves along the ribbon. **Hold Right** jumps to the next section.
-- **OK** opens an app. **Up** on a tile gives options (move, hide, app info, uninstall).
-- **Menu (☰)** opens settings. Weather: Settings → Display → Weather city.
-- The bottom-left keys are Search, Settings, Wi-Fi and VPN. VPN is green when connected and red when not.
-  Pick your VPN app in Settings → Status bar.
+In Home on Fire, choose **Firebolt Home** as the target. The same command also gives the launcher the one-time
+permission its ad-block switch needs.
+
+**Using it with the remote**
+- **Left / Right** moves along the ribbon. **Hold Right** (or Left) jumps a whole section.
+- **OK** opens the app. The apps you opened last appear first, under **RECENT**.
+- **Up** on a tile opens its options: Open, Move, Hide, App info, Uninstall.
+- **Moving a tile:** choose **Move**. The tile lifts and shows ‹ ✕ ›.
+  - **Left / Right** carries it along the ribbon.
+  - **OK** puts it down.
+  - **Up** takes it off the ribbon. It's hidden, not uninstalled; bring it back in Settings → Apps.
+- **The four keys at the bottom left:**
+  - 🔍 **Search:** type part of an app's name.
+  - ⚙ **Quick panel:** ad-block DNS on/off, Wi-Fi, Bluetooth, display and sound, start the screensaver,
+    home screen settings and Fire TV settings. It also warns you while ADB debugging is still on.
+  - **Wi-Fi:** opens network settings.
+  - **VPN:** green when connected, red when not. Pressing it opens your VPN app; pick which app in
+    Quick panel → Home screen settings → Status bar.
+- **Weather:** press **Set your city for weather** at the top, or go to Quick panel → Home screen settings → Display →
+  Weather city. Type your city, then pick it from the list. °C/°F is in the same place.
+- **Sections:** the group names (Streaming, Music, Apps…) are Couchy's sections. Rename them, or move apps between
+  them, in Home screen settings → Sections. For example, name the first one "Pinned".
+
+**A 2-minute check on the stick** (things only a real remote can prove)
+1. Press **Home**: Firebolt Home appears and the first RECENT tile is highlighted.
+2. Press Right a few times, then hold Right: it jumps to the next section.
+3. Press Up on a tile: the options menu opens. Choose Move, press Right twice, then OK. The tile stays where you put it.
+4. Open the Quick panel. With ADB still on, the yellow warning shows. Flip Ad-block DNS on, then off.
+5. Turn your VPN on and off: the bottom-left key turns green, then red.
+6. Set your city: the forecast and the sun or moon arc appear within a few seconds.
+
+If any step misbehaves, Couchy is still installed: set it back as Home on Fire's target and tell me what happened.
 
 Don't like it? `LAUNCHER=firebolt scripts/launcher.sh undo --uninstall`, then set Couchy as Home on Fire's target again.
 

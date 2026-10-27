@@ -95,6 +95,8 @@ setup() {
   installed $COUCHY || { echo "$NAME is not installed. Pass its APK: scripts/launcher.sh setup launcher.apk" >&2; exit 1; }
   installed $HOF || { echo "Home on Fire is not installed. Pass its APK: scripts/launcher.sh setup home-on-fire.apk" >&2; exit 1; }
   tv "pm grant $HOF $PERM"
+  # Firebolt Home's Quick panel switches ad-block DNS itself; the same one-time grant allows it.
+  if [ "$COUCHY" = io.github.firebolt141.home ]; then tv "pm grant $COUCHY $PERM"; fi
   # Append, never overwrite: other accessibility services (VoiceView, button mappers) stay as they are.
   svc="$(services)"
   if ! has_service "$svc"; then
@@ -126,6 +128,7 @@ undo() {
     tv 'settings delete secure enabled_accessibility_services'
   fi
   if installed $HOF; then tv "pm revoke $HOF $PERM" || true; fi
+  if [ "$COUCHY" = io.github.firebolt141.home ] && installed "$COUCHY"; then tv "pm revoke $COUCHY $PERM" || true; fi
   if [ "${1:-}" = --uninstall ]; then
     for p in $HOF $COUCHY; do installed $p && tv "pm uninstall $p"; done
   fi

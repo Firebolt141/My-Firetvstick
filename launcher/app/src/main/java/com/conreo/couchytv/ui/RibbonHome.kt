@@ -105,6 +105,7 @@ import com.conreo.couchytv.data.Forecast
 import com.conreo.couchytv.data.LauncherConfig
 import com.conreo.couchytv.data.NetStatus
 import com.conreo.couchytv.data.Place
+import com.conreo.couchytv.data.RibbonOrder
 import com.conreo.couchytv.data.Sky
 import com.conreo.couchytv.data.Weather
 import kotlinx.coroutines.Dispatchers
@@ -165,30 +166,26 @@ fun RibbonHome(
     moveFocus: FocusRequester,
     onLaunch: (AppEntry) -> Unit,
     onMenu: (AppEntry) -> Unit,
+    /** Opens the launcher's own settings sheet (from the Quick panel). */
     onSettings: () -> Unit,
     onNetwork: () -> Unit,
     onVpn: () -> Unit,
     onSetPlace: (Place?) -> Unit,
-    /** Screenshot tests pass a fixed forecast instead of fetching one. */
+    /** Screenshot tests pass a fixed forecast and clock instead of fetching / reading them. */
     previewForecast: Forecast? = null,
+    previewNow: Long? = null,
 ) {
     val recentLabel = stringResource(R.string.ribbon_recent)
-    // Recent first (not movable), then every section once, in the dock's order
-    // (an app in several sections shows in the first), so move mode's flat
-    // reordering (moveDock) matches what is on screen.
-    val items = remember(apps, sections, config.recent, config.hidden, recentLabel) {
-        val byPkg = apps.associateBy { it.pkg }
+    // Recent first, then every section once without the Recent apps
+    // (RibbonOrder, shared with move mode so moves match what is on screen).
+    val items = remember(apps, sections, config.recent, config.hidden, movePkg, recentLabel) {
+        val recent = RibbonOrder.recent(apps, config)
         val out = ArrayList<RibbonItem>()
-        config.recent.asSequence().mapNotNull { byPkg[it] }.filter { it.pkg !in config.hidden }.take(3)
-            .forEachIndexed { i, app -> out += RibbonItem("r:${app.pkg}", app, recentLabel, i == 0, true) }
-        val seen = HashSet<String>()
-        for ((cat, list) in sections) {
-            var first = true
-            for (app in list) {
-                if (!seen.add(app.pkg)) continue
-                out += RibbonItem("c:${app.pkg}", app, cat.name, first, false)
-                first = false
-            }
+        recent.forEachIndexed { i, app -> out += RibbonItem("r:${app.pkg}", app, recentLabel, i == 0, true) }
+        var lastCat: String? = null
+        for ((cat, app) in RibbonOrder.flat(sections, recent.map { it.pkg }.toSet(), movePkg)) {
+            out += RibbonItem("c:${app.pkg}", app, cat.name, cat.id != lastCat, false)
+            lastCat = cat.id
         }
         out
     }
@@ -196,6 +193,7 @@ fun RibbonHome(
     var focusedItem by remember { mutableStateOf<RibbonItem?>(null) }
     var showSearch by remember { mutableStateOf(false) }
     var showCity by remember { mutableStateOf(false) }
+    var showQuick by remember { mutableStateOf(false) }
 
     val locale = androidx.core.os.ConfigurationCompat.getLocales(LocalConfiguration.current).get(0) ?: Locale.getDefault()
     val forecast = previewForecast ?: rememberForecast(config)
@@ -213,7 +211,7 @@ fun RibbonHome(
         )
 
         if (movePkg == null) {
-            Header(u, config, time, locale, forecast, accent, onSetCity = { showCity = true })
+            Header(u, config, time, previewNow, locale, forecast, accent, onSetCity = { showCity = true })
             focusedItem?.let { item ->
                 Row(
                     Modifier.offset(u.d(60), u.d(720 - BAND - 56)),
@@ -251,7 +249,7 @@ fun RibbonHome(
             u, accent, net,
             modifier = Modifier.align(Alignment.BottomStart),
             onSearch = { showSearch = true },
-            onSettings = onSettings,
+            onSettings = { showQuick = true },
             onNetwork = onNetwork,
             onVpn = onVpn,
         )
@@ -266,6 +264,13 @@ fun RibbonHome(
     }
 
     if (showSearch) SearchDialog(apps.filter { it.pkg !in config.hidden }, onDismiss = { showSearch = false }, onLaunch = { showSearch = false; onLaunch(it) })
+    if (showQuick) QuickPanel(
+        net = net,
+        accent = accent,
+        onDismiss = { showQuick = false },
+        onLauncherSettings = { showQuick = false; onSettings() },
+        onNetwork = { showQuick = false; onNetwork() },
+    )
     if (showCity) CityDialog(current = config.weatherPlace, onDismiss = { showCity = false }, onPick = { showCity = false; onSetPlace(it) })
 }
 
@@ -298,13 +303,14 @@ private fun Header(
     u: Units,
     config: LauncherConfig,
     time: String,
+    previewNow: Long?,
     locale: Locale,
     forecast: Forecast?,
     accent: Color,
     onSetCity: () -> Unit,
 ) {
     // `time` changes every minute, which also refreshes everything derived from now.
-    val now = remember(time) { System.currentTimeMillis() }
+    val now = remember(time, previewNow) { previewNow ?: System.currentTimeMillis() }
     val weekday = remember(time, locale) { SimpleDateFormat("EEEE", locale).format(Date(now)).uppercase(locale) }
     val date = remember(time, locale) { SimpleDateFormat("d MMMM", locale).format(Date(now)) }
 
@@ -383,9 +389,9 @@ private fun skyName(sky: Sky, day: Boolean): String = stringResource(
 )
 
 /** Where the sun (by day) or moon (by night) is between its two horizon events. */
-private data class Arc(val day: Boolean, val start: Long, val end: Long, val progress: Float)
+internal data class Arc(val day: Boolean, val start: Long, val end: Long, val progress: Float)
 
-private fun arcOf(f: Forecast, now: Long): Arc? {
+internal fun arcOf(f: Forecast, now: Long): Arc? {
     val lastRise = f.sunrises.filter { it <= now }.maxOrNull()
     val lastSet = f.sunsets.filter { it <= now }.maxOrNull()
     val day = lastRise != null && (lastSet == null || lastRise > lastSet)
@@ -702,7 +708,8 @@ private fun Tile(u: Units, app: AppEntry, focused: Boolean, moving: Boolean, acc
             .semantics { contentDescription = app.label },
         contentAlignment = Alignment.Center,
     ) {
-        val zoom = if (focused || moving) 1.12f else 1f
+        // Moving: a little smaller, to leave room for the ‹ › arrows.
+        val zoom = when { moving -> 0.82f; focused -> 1.12f; else -> 1f }
         when {
             app.banner != null -> Image(
                 bitmap = app.banner,
@@ -718,6 +725,25 @@ private fun Tile(u: Units, app: AppEntry, focused: Boolean, moving: Boolean, acc
             else -> Text(app.label, fontSize = u.s(14), color = Color.White, maxLines = 2, overflow = TextOverflow.Ellipsis)
         }
         if (dim) Box(Modifier.fillMaxSize().background(Color(0x47000000)))
+        if (moving) {
+            // Edit mode: ‹ › show it moves with Left/Right, the ✕ badge that Up removes it.
+            Canvas(Modifier.fillMaxSize()) {
+                val off = size.height * SLANT
+                val midY = size.height / 2
+                val chev = u.px(9)
+                val stroke = Stroke(u.px(3), cap = StrokeCap.Round)
+                val lx = off / 2 + u.px(14)
+                val rx = size.width - off / 2 - u.px(14)
+                drawPath(Path().apply { moveTo(lx + chev / 2, midY - chev); lineTo(lx - chev / 2, midY); lineTo(lx + chev / 2, midY + chev) }, Color.White, style = stroke)
+                drawPath(Path().apply { moveTo(rx - chev / 2, midY - chev); lineTo(rx + chev / 2, midY); lineTo(rx - chev / 2, midY + chev) }, Color.White, style = stroke)
+                val c = Offset(size.width / 2 + off * 0.4f, u.px(34))
+                drawCircle(Color.White, u.px(17), c)
+                drawCircle(accent, u.px(17), c, style = Stroke(u.px(3)))
+                val x = u.px(6)
+                drawLine(Color(0xFF15161A), c + Offset(-x, -x), c + Offset(x, x), u.px(3), StrokeCap.Round)
+                drawLine(Color(0xFF15161A), c + Offset(-x, x), c + Offset(x, -x), u.px(3), StrokeCap.Round)
+            }
+        }
     }
 }
 

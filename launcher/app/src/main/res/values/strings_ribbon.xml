@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- Firebolt Home's ribbon layout. English only for now; other languages fall back to these. -->
-<resources xmlns:tools="http://schemas.android.com/tools" tools:ignore="MissingTranslation">
+<!-- Firebolt Home ribbon layout. Translations live in values-XX/strings_ribbon.xml. -->
+<resources>
     <string name="mode_ribbon">Ribbon</string>
     <string name="mode_ribbon_desc">Slanted app ribbon with clock, forecast and sun arc</string>
     <string name="ribbon_recent">Recent</string>
@@ -21,7 +21,7 @@
     <string name="ribbon_set_city">Set your city for weather</string>
     <string name="ribbon_weather_loading">Loading weather…</string>
     <string name="ribbon_edit_title">EDIT MODE</string>
-    <string name="ribbon_edit_hint">Left and Right move the tile · OK drops it · Back cancels</string>
+    <string name="ribbon_edit_hint">Left and Right move the tile · Up removes it from the ribbon · OK drops it</string>
     <string name="ribbon_search_hint">Type an app name</string>
     <string name="ribbon_no_match">No app matches</string>
     <string name="key_search">Search apps</string>
@@ -47,4 +47,27 @@
     <string name="sky_rain">Rain</string>
     <string name="sky_snow">Snow</string>
     <string name="sky_storm">Thunderstorm</string>
+    <string name="quick_title">Quick panel</string>
+    <string name="quick_back">Back to close</string>
+    <string name="quick_adb_title">ADB debugging is on</string>
+    <string name="quick_adb_body">Anything on your Wi-Fi can control this stick. Turn it off when you are done.</string>
+    <string name="quick_adb_open">Open developer options</string>
+    <string name="quick_dns">Ad-block DNS</string>
+    <string name="quick_dns_on">On · %1$s</string>
+    <string name="quick_dns_off">Off · OK to turn on</string>
+    <string name="quick_dns_setup">Needs a one-time setup (see the guide)</string>
+    <string name="quick_network">Network</string>
+    <string name="quick_net_wifi">Wi-Fi connected</string>
+    <string name="quick_net_ethernet">Ethernet connected</string>
+    <string name="quick_net_offline">Not connected</string>
+    <string name="quick_bluetooth">Bluetooth</string>
+    <string name="quick_bluetooth_sub">Remotes, speakers, headphones</string>
+    <string name="quick_display">Display and sound</string>
+    <string name="quick_display_sub">Resolution, audio output</string>
+    <string name="quick_screensaver">Start screensaver</string>
+    <string name="quick_screensaver_sub">Or change it in its settings</string>
+    <string name="quick_launcher">Home screen settings</string>
+    <string name="quick_launcher_sub">Wallpaper, sections, weather city</string>
+    <string name="quick_fire_settings">Fire TV settings</string>
+    <string name="quick_fire_settings_sub">Everything else</string>
 </resources>

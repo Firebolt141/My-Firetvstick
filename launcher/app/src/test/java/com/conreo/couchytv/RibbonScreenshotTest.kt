@@ -87,8 +87,11 @@ class RibbonScreenshotTest {
     private fun forecast(now: Long, day: Boolean): Forecast {
         val h = 3_600_000L
         val hour = now - now % h
-        val rise = if (day) hour - 10 * h + 12 * 60_000L else hour - 14 * h + 12 * 60_000L
-        val set = if (day) hour + 94 * 60_000L else hour - 2 * h - 56 * 60_000L
+        val dayStart = hour - (hour - java.util.Calendar.getInstance().apply {
+            timeInMillis = hour; set(java.util.Calendar.HOUR_OF_DAY, 0)
+        }.timeInMillis)
+        val rise = dayStart + 6 * h + 12 * 60_000L   // 06:12
+        val set = dayStart + 18 * h + 4 * 60_000L    // 18:04
         return Forecast(
             place = "Bengaluru", fetchedAt = now, temp = if (day) 29 else 24,
             sky = if (day) Sky.PARTLY else Sky.CLEAR, isDay = day, high = 31, low = 21, windKmh = 12,
@@ -105,8 +108,12 @@ class RibbonScreenshotTest {
         )
     }
 
-    private fun shot(name: String, day: Boolean, vpn: Boolean, movePkg: String? = null) {
-        val now = System.currentTimeMillis()
+    private fun shot(name: String, day: Boolean, vpn: Boolean, movePkg: String? = null, quick: Boolean = false) {
+        val now = java.util.Calendar.getInstance().apply {
+            set(java.util.Calendar.HOUR_OF_DAY, if (day) 16 else 20)
+            set(java.util.Calendar.MINUTE, if (day) 30 else 42)
+            set(java.util.Calendar.SECOND, 0); set(java.util.Calendar.MILLISECOND, 0)
+        }.timeInMillis
         val config = LauncherConfig(
             layout = 3, setupDone = true,
             recent = listOf("com.netflix.ninja", "in.startv.hotstar", "org.videolan.vlc"),
@@ -135,13 +142,20 @@ class RibbonScreenshotTest {
                         movePkg = movePkg, moveFocus = FocusRequester(),
                         onLaunch = {}, onMenu = {}, onSettings = {}, onNetwork = {}, onVpn = {}, onSetPlace = {},
                         previewForecast = forecast(now, day),
+                        previewNow = now,
+                    )
+                    if (quick) com.conreo.couchytv.ui.QuickPanel(
+                        net = NetStatus(wifi = true, vpn = vpn), accent = ACCENTS[6],
+                        onDismiss = {}, onLauncherSettings = {}, onNetwork = {},
                     )
                 }
             }
         }
         compose.waitForIdle()
         compose.mainClock.advanceTimeBy(1_000)
-        compose.onRoot().captureRoboImage("build/outputs/roborazzi/$name.png")
+        // captureScreenRoboImage includes dialog windows (the Quick panel).
+        @OptIn(com.github.takahirom.roborazzi.ExperimentalRoborazziApi::class)
+        com.github.takahirom.roborazzi.captureScreenRoboImage("build/outputs/roborazzi/$name.png")
     }
 
     @Test fun dayVpnOn() = shot("ribbon-day", day = true, vpn = true)
@@ -149,6 +163,15 @@ class RibbonScreenshotTest {
     @Test fun nightVpnOff() = shot("ribbon-night", day = false, vpn = false)
 
     @Test fun editMode() = shot("ribbon-edit", day = true, vpn = true, movePkg = "com.spotify.tv.android")
+
+    @Test fun quickPanel() = shot("ribbon-quick", day = false, vpn = true, quick = true)
+
+    // German has the longest words: checks nothing overflows once translated.
+    @Config(qualifiers = "de-w960dp-h540dp-land-xhdpi")
+    @Test fun dayGerman() = shot("ribbon-day-de", day = true, vpn = false)
+
+    @Config(qualifiers = "de-w960dp-h540dp-land-xhdpi")
+    @Test fun quickPanelGerman() = shot("ribbon-quick-de", day = true, vpn = true, quick = true)
 
     @Suppress("unused")
     private fun Color.argb() = toArgb()
