@@ -21,10 +21,12 @@ Settings, keyboard, remote and Bluetooth, **Alexa voice search** on the mic butt
 | `debloat/02-ads.txt` | Batch 2: ad sync, sponsored previews, ad ID, recommendations, shopping, Live tab, promos |
 | `debloat/03-preloads.txt` | Batch 3: Silk, Luna, Music, Photos, Kids, tutorials, setup helpers, Ambient |
 | `debloat/04-alexa-extras.txt` | Batch 4: Alexa alarms, timers, music, calling, smart-home dashboard (voice search stays) |
-| `scripts/` | The wrappers you run (below) |
+| `scripts/` | The wrappers you run (below), plus `check-lists.sh`, which checks the lists offline (also run by CI) |
 | `cleanyourtv/` | Files vendored from upstream: `tools/`, the reference list, TROUBLESHOOTING, LICENSE (MIT), `UPSTREAM_COMMIT` |
 
-To keep an app, put a `#` in front of its line before you run that batch.
+To keep an app, put a `#` in front of its line before you run that batch. After editing a list, run
+`scripts/check-lists.sh`. It needs no stick and rejects typos, duplicates, core Android packages, packages Fire OS
+protects, and packages this setup must keep (Home, Prime Video, Alexa voice, casting, OTA, `com.amazon.imp`).
 
 ## Run it
 
@@ -91,6 +93,9 @@ scripts/restore.sh 03     # just one batch
 scripts/dns.sh off
 ```
 `restore.sh` re-enables exactly what each batch disabled. Anything that was already disabled before stays disabled.
+It finds the undo record in `~/.cleanyourtv/` by the list's full path, so run it from the same folder you debloated
+from. `debloat.sh` also copies the records to `backup/<time>/recovery/`. If `~/.cleanyourtv/` is lost, copy them back
+there. Without a record, restore just re-enables every package in the list.
 To bring back a single app instead:
 ```sh
 cleanyourtv/tools/tv.py 'pm enable com.amazon.bueller.music'

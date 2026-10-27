@@ -4,9 +4,11 @@
 # Usage: TV_HOST=192.168.1.50 scripts/debloat.sh 01        (or: 01 02, or: all)
 set -euo pipefail
 source "$(dirname "$0")/common.sh"
-ls -d "$ROOT"/backup/*/ >/dev/null 2>&1 || { echo "No backup yet. Run scripts/backup.sh first." >&2; exit 1; }
+BACKUP="$(latest_backup)"
+[ -n "$BACKUP" ] || { echo "No backup yet. Run scripts/backup.sh first." >&2; exit 1; }
+LISTS="$(batches "$@")"
 mkdir -p "$ROOT/shots"
-for list in $(batches "$@"); do
+for list in $LISTS; do
   name="$(basename "$list" .txt)"
   echo "=== $name"
   if [ "${name%%-*}" = 02 ]; then
@@ -15,6 +17,9 @@ for list in $(batches "$@"); do
   else
     "$TOOLS/disable.sh" "$list"
   fi
+  # disable.sh keeps its undo record only in ~/.cleanyourtv/ ("the only copy"); keep one next to the backup.
+  mkdir -p "$BACKUP/recovery"
+  cp -p "$HOME"/.cleanyourtv/recovery-*.json "$BACKUP/recovery/" 2>/dev/null || true
   sleep 3
   tv --screenshot "$ROOT/shots/after-$name.png" HOME --wait 3 || \
     echo "(screenshot failed or came back empty; look at the TV itself)" >&2

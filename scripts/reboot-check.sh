@@ -7,18 +7,21 @@ source "$(dirname "$0")/common.sh"
 tv sync
 sleep 15
 tv --reboot
-echo "Rebooting. Waiting for the stick to come back..."
+echo "Rebooting. Waiting for the stick to come back (up to ~3 minutes)..."
 sleep 30
-for i in $(seq 1 30); do
-  tv 'getprop sys.boot_completed' 2>/dev/null | grep -q 1 && break
+booted=""
+for _ in $(seq 1 30); do
+  if tv 'getprop sys.boot_completed' 2>/dev/null | grep -q 1; then booted=1; break; fi
   sleep 5
 done
-DISABLED="$(tv 'pm list packages -d --user 0' | tr -d '\r' | sed -n 's/^package://p')"
+[ -n "$booted" ] || { echo "The stick did not answer after the reboot. Check it is on and ADB Debugging is still ON, then run this again." >&2; exit 1; }
+# One query for every enabled package, instead of one connection per listed package.
+ENABLED="$(tv 'pm list packages -e --user 0' | tr -d '\r' | sed -n 's/^package://p')"
+[ -n "$ENABLED" ] || { echo "Could not read the package list from the stick." >&2; exit 1; }
 back=0
 for list in $(batches all); do
-  for p in $(grep -vE '^\s*(#|$)' "$list" | awk '{print $1}'); do
-    if tv "pm list packages --user 0 $p" | tr -d '\r' | grep -qx "package:$p" \
-       && ! printf '%s\n' "$DISABLED" | grep -qx "$p"; then
+  for p in $(grep -vE '^[[:space:]]*(#|$)' "$list" | awk '{print $1}'); do
+    if printf '%s\n' "$ENABLED" | grep -qxF "$p"; then
       echo "enabled again after reboot: $p ($(basename "$list"))"; back=1
     fi
   done
