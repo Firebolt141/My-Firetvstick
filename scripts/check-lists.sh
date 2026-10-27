@@ -16,7 +16,7 @@ com.amazon.device.software.ota.override com.amazon.tv.forcedotaupdater.v2 com.am
 com.amazon.vizzini com.amazon.aria com.amazon.cardinal com.amazon.tcomm com.amazon.alexa.datastore
 com.amazon.cast.sink com.amazon.dialservice com.amazon.awvflingreceiver com.amazon.whisperplay com.amazon.tv.matter
 com.amazon.ftv.screensaver com.amazon.logan
-com.conreo.couchytv io.github.toolicious.homeonfire com.amazon.tv.quicksettings.ui'
+com.conreo.couchytv io.github.firebolt141.home io.github.toolicious.homeonfire com.amazon.tv.quicksettings.ui'
 fail=0
 all=""
 for list in "$ROOT"/debloat/[0-9][0-9]-*.txt; do

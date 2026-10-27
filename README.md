@@ -51,6 +51,13 @@ Tips:
 - The debloat leaves on everything both apps need: Amazon Home, the Appstore (`venezia`), quick
   settings and the accessibility host. `check-lists.sh` blocks any list from disabling them.
 
+### Firebolt Home: your own fork of Couchy
+
+`launcher/` is a fork of Couchy (GPLv3) with its own app ID, `io.github.firebolt141.home`, so it installs next to
+Couchy. Nothing is built yet. [launcher/FORK.md](launcher/FORK.md) covers signing, the manual `launcher-apk`
+workflow, local builds and pulling in upstream changes. Once a build is installed, use
+`LAUNCHER=firebolt scripts/launcher.sh status|setup|undo`.
+
 ## Layout
 
 | Path | What |
@@ -61,6 +68,8 @@ Tips:
 | `debloat/04-alexa-extras.txt` | Batch 4: Alexa alarms, timers, music, calling, smart-home dashboard (voice search stays) |
 | `scripts/` | The wrappers you run (below), plus `check-lists.sh`, which checks the lists offline (also run by CI) |
 | `scripts/launcher.sh` | Couchy + Home on Fire: status, setup/repair, undo |
+| `launcher/` | Firebolt Home, a fork of Couchy Launcher (GPLv3); see `launcher/FORK.md` |
+| `scripts/build-launcher.sh`, `scripts/launcher-keystore.sh` | Build the fork locally; create its signing key (one-time) |
 | `cleanyourtv/` | Files vendored from upstream: `tools/`, the reference list, TROUBLESHOOTING, LICENSE (MIT), `UPSTREAM_COMMIT` |
 
 To keep an app, put a `#` in front of its line before you run that batch. After editing a list, run
