@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- Firebolt Home ribbon layout. Translations live in values-XX/strings_ribbon.xml. -->
-<resources>
+<!-- Firebolt Home ribbon layout. English only; other languages fall back to these. -->
+<resources xmlns:tools="http://schemas.android.com/tools" tools:ignore="MissingTranslation">
     <string name="mode_ribbon">Ribbon</string>
     <string name="mode_ribbon_desc">Slanted app ribbon with clock, forecast and sun arc</string>
     <string name="ribbon_recent">Recent</string>

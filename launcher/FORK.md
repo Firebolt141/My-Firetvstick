@@ -20,7 +20,6 @@ Changes from upstream so far:
 ![Night, VPN off](docs/img/ribbon-night.jpg)
 ![Edit mode](docs/img/ribbon-edit.jpg)
 ![Quick panel](docs/img/ribbon-quick.jpg)
-![German](docs/img/ribbon-day-de.jpg)
 
 Rendered off-device by `./gradlew recordRoborazziDebug` (sample apps and weather). The same run executes the
 logic and remote-key tests; CI runs it on every launcher change (`.github/workflows/launcher-tests.yml`).

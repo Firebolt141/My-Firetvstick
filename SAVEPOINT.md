@@ -18,11 +18,11 @@ Design canvas (private): https://claude.ai/artifact/JJBnJQNc2JzJvGw8aSFPQ4
   - Header: clock, date, weather, a 6-hour strip, and the sun/moon arc with chips. Data from `data/Weather.kt` (Open-Meteo, no key).
   - Brand tile colours are sampled from each banner's edges.
   - Settings → Display: Ribbon mode, weather city, °C/°F.
-  - All new text is translated into Couchy's 17 languages (`res/values-*/strings_ribbon.xml`).
-- **Tests** (`launcher/app/src/test`, 19 passing):
+  - The ribbon's text is English only (`res/values/strings_ribbon.xml`).
+- **Tests** (`launcher/app/src/test`, 17 passing):
   - `RibbonLogicTest`: ordering, the move step past hidden Recent apps, Open-Meteo parsing in the city's time zone, the day/night arc, weather codes, moon.
   - `RibbonInteractionTest`: remote keys. Focus starts on Recent; Right moves; OK launches; Up opens the menu; holding Right/Left jumps sections; no duplicate tiles.
-  - `RibbonScreenshotTest`: day, night, edit mode, Quick panel, and German. Renders are in `launcher/docs/img/ribbon-*.jpg`.
+  - `RibbonScreenshotTest`: day, night, edit mode, and Quick panel. Renders are in `launcher/docs/img/ribbon-*.jpg`.
   - CI: `.github/workflows/launcher-tests.yml` runs them plus lint whenever `launcher/` changes, and keeps the renders.
 - **Builds**: `lintRelease` + `assembleRelease` pass (2.4 MB APK). The signed build is the manual `launcher-apk` workflow.
 

@@ -166,13 +166,6 @@ class RibbonScreenshotTest {
 
     @Test fun quickPanel() = shot("ribbon-quick", day = false, vpn = true, quick = true)
 
-    // German has the longest words: checks nothing overflows once translated.
-    @Config(qualifiers = "de-w960dp-h540dp-land-xhdpi")
-    @Test fun dayGerman() = shot("ribbon-day-de", day = true, vpn = false)
-
-    @Config(qualifiers = "de-w960dp-h540dp-land-xhdpi")
-    @Test fun quickPanelGerman() = shot("ribbon-quick-de", day = true, vpn = true, quick = true)
-
     @Suppress("unused")
     private fun Color.argb() = toArgb()
 }
